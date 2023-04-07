@@ -313,7 +313,7 @@ def build_mujoco_model(xml_path = 'rat_hind_3_joint_free.xml',  mujoco_dt = 0.1/
     # load in the mujoco model and simulation
     model = mujoco.MjModel.from_xml_path(xml_path)
     data = mujoco.MjData(model)
-    qpos0 = np.array([0.0575931, -0.00159813, 7.01028e-18, -0.000591287, -0.999527, 0.199988, -0.000591287, -0.999527, 0.199988]) 
+    qpos0 = np.array([0.0575931, -0.00159813, 7.01028e-18, 0.0, -0.000591287, -0.999527, 0.199988, -0.000591287, -0.999527, 0.199988]) 
 
     # setting the initial pose to be at the simulations resting point
     data.qpos = qpos0
@@ -324,7 +324,7 @@ def build_mujoco_model(xml_path = 'rat_hind_3_joint_free.xml',  mujoco_dt = 0.1/
 
     return model, data
 
-def stim2tension(stim):
+def stim2activation(stim):
     """
     converts from a neural potential to a muscle activation between 0 and 1 with a clipped sigmoid curve
     :param stim: MN potential in mV
@@ -333,7 +333,7 @@ def stim2tension(stim):
 
     steepness = 0.1532
     x_off = -70
-    y_offset = -0.1
+    y_offset = -0.01
     amp = 1
     act = amp/(1 + np.exp(steepness*(x_off-stim))) + y_offset
     act = np.clip(act, 0,1)
@@ -363,6 +363,13 @@ def run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec):
     L_ankle_ext_ind = 10
     L_ankle_flx_ind = 11
 
+    R_hip_joint_ind = 7
+    R_ankle_joint_ind = 8
+    R_knee_joint_ind = 9
+    L_hip_joint_ind = 4
+    L_ankle_joint_ind = 5
+    L_knee_joint_ind = 6
+
 
     
     R_hip_joint_pos = np.zeros(num_steps)
@@ -383,19 +390,19 @@ def run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec):
         L_sns_data[i,:] = L_sns_model(sns_inputs_LH)
         R_sns_data[i,:] = R_sns_model(sns_inputs_RH)
         # use the sns Motor neuron data to activate muscles
-        mj_data.act[L_hip_ext_ind] = stim2tension(L_sns_data[i-1,6])
-        mj_data.act[L_hip_flx_ind] = stim2tension(L_sns_data[i-1,7])
-        mj_data.act[L_knee_ext_ind] = stim2tension(L_sns_data[i-1,8])
-        mj_data.act[L_knee_flx_ind] = stim2tension(L_sns_data[i-1,9])
-        mj_data.act[L_ankle_ext_ind] = stim2tension(L_sns_data[i-1,10])
-        mj_data.act[L_ankle_flx_ind] = stim2tension(L_sns_data[i-1,11])
+        mj_data.act[L_hip_ext_ind] = stim2activation(L_sns_data[i-1,6])
+        mj_data.act[L_hip_flx_ind] = stim2activation(L_sns_data[i-1,7])
+        mj_data.act[L_knee_ext_ind] = stim2activation(L_sns_data[i-1,8])
+        mj_data.act[L_knee_flx_ind] = stim2activation(L_sns_data[i-1,9])
+        mj_data.act[L_ankle_ext_ind] = stim2activation(L_sns_data[i-1,10])
+        mj_data.act[L_ankle_flx_ind] = stim2activation(L_sns_data[i-1,11])
 
-        mj_data.act[R_hip_ext_ind] = stim2tension(R_sns_data[i-1,6])
-        mj_data.act[R_hip_flx_ind] = stim2tension(R_sns_data[i-1,7])
-        mj_data.act[R_knee_ext_ind] = stim2tension(R_sns_data[i-1,8])
-        mj_data.act[R_knee_flx_ind] = stim2tension(R_sns_data[i-1,9])
-        mj_data.act[R_ankle_ext_ind] = stim2tension(R_sns_data[i-1,10])
-        mj_data.act[R_ankle_flx_ind] = stim2tension(R_sns_data[i-1,11])
+        mj_data.act[R_hip_ext_ind] = stim2activation(R_sns_data[i-1,6])
+        mj_data.act[R_hip_flx_ind] = stim2activation(R_sns_data[i-1,7])
+        mj_data.act[R_knee_ext_ind] = stim2activation(R_sns_data[i-1,8])
+        mj_data.act[R_knee_flx_ind] = stim2activation(R_sns_data[i-1,9])
+        mj_data.act[R_ankle_ext_ind] = stim2activation(R_sns_data[i-1,10])
+        mj_data.act[R_ankle_flx_ind] = stim2activation(R_sns_data[i-1,11])
 
         # take one timestep in the mujoco model
         mujoco.mj_step(mj_model, mj_data)
@@ -412,13 +419,13 @@ def run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec):
         sns_inputs_LH = np.concatenate([cpg_inputs[i,:],L_muscle_tensions])
         sns_inputs_RH = np.concatenate([cpg_inputs[i,:],R_muscle_tensions])
 
-        L_hip_joint_pos[i] = mj_data.qpos[3] 
-        L_knee_joint_pos[i] = mj_data.qpos[4] 
-        L_ankle_joint_pos[i] = mj_data.qpos[5] 
+        L_hip_joint_pos[i] = mj_data.qpos[L_hip_joint_ind] 
+        L_knee_joint_pos[i] = mj_data.qpos[L_knee_joint_ind] 
+        L_ankle_joint_pos[i] = mj_data.qpos[L_ankle_joint_ind] 
 
-        R_hip_joint_pos[i] = mj_data.qpos[6] 
-        R_knee_joint_pos[i] = mj_data.qpos[7] 
-        R_ankle_joint_pos[i] = mj_data.qpos[8] 
+        R_hip_joint_pos[i] = mj_data.qpos[R_hip_joint_ind] 
+        R_knee_joint_pos[i] = mj_data.qpos[R_knee_joint_ind] 
+        R_ankle_joint_pos[i] = mj_data.qpos[R_ankle_joint_ind] 
 
     
     L_sns_data = L_sns_data.transpose()
@@ -485,6 +492,7 @@ def main():
     inputs = Iapp + Ipert
 
     run_sims(sns_dt = dt, cpg_inputs = inputs, xml_path = xml_path, time_vec = t, num_steps = numSteps)
+
     
     
 if __name__ == '__main__':

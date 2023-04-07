@@ -136,19 +136,53 @@ def plot_sigmoid_muscle_activation():
     plt.ylabel('Muscle Activation')
     plt.xlabel('Neuron Potential (mV)')
     plt.title('Muscle Activation Curve')
-    plt.text(-105, 0.7, r"$1/(1+e^{0.1532(-70-Potential)}) - 0.1$")
+    plt.text(-105, 0.7, r"$1/(1+e^{0.1532(-70-Potential)}) - 0.01$")
     plt.text(-101, 0.78, 'Clipped between 0 and 1')
     plt.show()
 
+def plot_animatlab_joint_angles():
 
+    animatlab_data = pd.read_csv('animatlab_L_joint_angles.txt', delimiter='\t')
+    fig, ax = plt.subplots(1,3, figsize = (20,4))
+    ax[0].plot(animatlab_data['Time']*1000, animatlab_data['LH_HipZ'],label='Animatlab',color='C0')
+    ax[0].set_xlabel('Time (ms)')
+    ax[0].set_ylabel('Joint Angle (rad)')
+    ax[0].set_title('Animatlab Simulation Hip')
+
+    ax[1].plot(animatlab_data['Time']*1000, animatlab_data['LH_Knee'],label='Left',color='C0')
+    ax[1].set_xlabel('Time (ms)')
+    ax[1].set_ylabel('Joint Angle (rad)')
+    ax[1].set_title('Animatlab Simulation Knee')
+
+    ax[2].plot(animatlab_data['Time']*1000, animatlab_data['LH_AnkleZ'],label='Left',color='C0')
+    ax[2].set_xlabel('Time (ms)')
+    ax[2].set_ylabel('Joint Angle (rad)')
+    ax[2].set_title('Animatlab Simulation Ankle')
+    plt.show()
+
+def sim_time_comparisons():
+
+    time_comp_data = pd.read_csv('sim_time_comp.csv')
+
+    print('Average run time in Animatlab: ', np.mean(time_comp_data['Animatlab Sim Times']))
+    print('Average run time in SNS-Toolbox: ', np.mean(time_comp_data['SNS_Mujoco Sim Times']))
+
+    plt.plot(time_comp_data['Animatlab Sim Times'], label='Animatlab')
+    plt.plot(time_comp_data['SNS_Mujoco Sim Times'], label='SNS-Toolbox & Mujoco')
+    plt.xlabel('Iteration')
+    plt.ylabel('Time (s)')
+    plt.legend()
+    plt.show()
 
 def main():
     data = pd.read_csv('sim_outputs.csv')
-    plot_RGs(data)
-    plot_PFs(data)
-    plot_joint_activity(data)
-    plot_mn_activity(data)
-    plot_sigmoid_muscle_activation()
+    # plot_RGs(data)
+    # plot_PFs(data)
+    # plot_joint_activity(data)
+    # plot_animatlab_joint_angles()
+    # plot_mn_activity(data)
+    # plot_sigmoid_muscle_activation()
+    sim_time_comparisons()
 
 
 if __name__ == '__main__':
