@@ -43,9 +43,9 @@ The files in this repository contain simulations for biomechanical models of a r
             - We set $x_{offset}$ to be the average of this range ($x_{offset} = -70  mV$)
             - We then say that at the lower range ($stim=-100 mV$), we want $act=0$, and at the higher range ($stim=-40 mV$) we want $act=0.98$
             - We then use that to solve for the steepness in the equation:
-            $$
-              \frac{1}{1 + e^{-30s}} - \frac{1}{1 + e^{30s}} + 0.98 = 0
-            $$
+            
+              $\frac{1}{1 + e^{-30s}} - \frac{1}{1 + e^{30s}} + 0.98 = 0$
+            
             - Solving for the steepness, s, we find $s = 0.1532$
         - run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec)
     - run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec): runs the sns and mujoco simulations together and outputs to a csv file
