@@ -77,7 +77,18 @@ def main():
     path_asim_file = Path("K&A synergy_Standalone.asim")
 
    
-    run_simulation(path_asim_file, path_simulator)
+    # run_simulation(path_asim_file, path_simulator)
+
+    save_times = np.zeros(100)
+    for i in range(100):
+        t_start = time.time()
+        run_simulation(path_asim_file, path_simulator)
+        save_times[i] = time.time() - t_start
+
+    time_comp = pd.read_csv('sim_time_comp.csv', delimiter=',')
+    time_comp['Animatlab Sim Times'] = save_times
+    time_comp.to_csv('sim_time_comp.csv', sep=',', index=False, header=True)
+
 
 
 if __name__ == '__main__':

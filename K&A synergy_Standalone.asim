@@ -4211,7 +4211,7 @@
 <ModuleName>IntegrateFireSim</ModuleName>
 <ModuleFileName>IntegrateFireSim_VC10.dll</ModuleFileName>
 <Type>IntegrateFireSimModule</Type>
-<TimeStep>0.0002</TimeStep>
+<TimeStep>0.0001</TimeStep>
 <SpikePeak>0</SpikePeak>
 <SpikeStrength>1</SpikeStrength>
 <AHPEquilPot>-70</AHPEquilPot>
@@ -9380,7 +9380,7 @@
 <ModuleName>PhysicsModule</ModuleName>
 <ModuleFileName>BulletAnimatSim_VC10_double.dll</ModuleFileName>
 <Type>PhysicsNeuralModule</Type>
-<TimeStep>5e-005</TimeStep>
+<TimeStep>1e-004</TimeStep>
 <Adapters>
 <Adapter>
 <ID>31372bd1-d9e3-491a-8d23-dd6a59e06c8e</ID>
