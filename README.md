@@ -34,9 +34,9 @@ The files in this repository contain simulations for biomechanical models of a r
         - In this model, all muscles share the same activation curve
         - Calculated as in Fletcher Youngs Dissertation: https://etd.ohiolink.edu/apexprod/rws_olink/r/1501/10?clear=10&p10_accession_num=case1648154057237043
             - We are given the basic function for a sigmoid:
-            $$ 
-              act = \frac{1}{1 + e^{s(x_{offset} - stim)}} + y_{offset}
-            $$
+            
+              $act = \frac{1}{1 + e^{s(x_{offset} - stim)}} + y_{offset}$
+        
             - where s is the steepness of the sigmoid and stim is the motor neuron potential.
             - The Motor neurons range in activity from -100 to -40 mV. 
             - We first set the $y_{offset}$ to -1% of the max activation, or $y_{offset} = -0.01$
