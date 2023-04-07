@@ -339,16 +339,11 @@ def stim2activation(stim):
     act = np.clip(act, 0,1)
     return act
 
-def run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec):
+def run_sims(R_sns_model, L_sns_model, mj_model, mj_data, cpg_inputs, num_steps, time_vec, save_data=1):
+
     """
     runs the simulations and saves the data to sim_outputs.csv
     """
-
-    # seperate sns models for the left and right hindlimbs
-    R_sns_model = build_net(dt = sns_dt)
-    L_sns_model = build_net(dt = sns_dt)
-    mj_model, mj_data = build_mujoco_model(xml_path=xml_path, mujoco_dt = sns_dt/1000)
-
 
     R_hip_ext_ind = 0
     R_hip_flx_ind = 1
@@ -428,49 +423,51 @@ def run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec):
         R_ankle_joint_pos[i] = mj_data.qpos[R_ankle_joint_ind] 
 
     
-    L_sns_data = L_sns_data.transpose()
-    R_sns_data = R_sns_data.transpose()
 
-    if os.path.isfile('sim_outputs.csv'):
-        os.remove('sim_outputs.csv')
+    if save_data:
+        L_sns_data = L_sns_data.transpose()
+        R_sns_data = R_sns_data.transpose()
 
-    L_RG_df = pd.DataFrame({'Time': time_vec})
-    L_RG_df.to_csv('sim_outputs.csv', sep=',', index=False, header=True)
+        if os.path.isfile('sim_outputs.csv'):
+            os.remove('sim_outputs.csv')
 
-    csv_input = pd.read_csv('sim_outputs.csv')
-    csv_input['L_RG_Ext'] = R_sns_data[:][0]
-    csv_input['L_RG_Flx'] = L_sns_data[:][1]
-    csv_input['L_PF_Hip_Ext'] = L_sns_data[:][2]
-    csv_input['L_PF_Hip_Flx'] = L_sns_data[:][3]
-    csv_input['L_PF_KA_Ext'] = L_sns_data[:][4]
-    csv_input['L_PF_KA_Flx'] = L_sns_data[:][5]
-    csv_input['L_MN_Hip_Ext'] = L_sns_data[:][6]
-    csv_input['L_MN_Hip_Flx'] = L_sns_data[:][7]
-    csv_input['L_MN_Knee_Ext'] = L_sns_data[:][8]
-    csv_input['L_MN_Knee_Flx'] = L_sns_data[:][9]
-    csv_input['L_MN_Ankle_Ext'] = L_sns_data[:][10]
-    csv_input['L_MN_Ankle_Flx'] = L_sns_data[:][11]
-    csv_input['L_Hip_Joint_pos'] =  L_hip_joint_pos
-    csv_input['L_Knee_Joint_pos'] =  L_knee_joint_pos
-    csv_input['L_Ankle_Joint_pos'] =  L_ankle_joint_pos
+        L_RG_df = pd.DataFrame({'Time': time_vec})
+        L_RG_df.to_csv('sim_outputs.csv', sep=',', index=False, header=True)
 
-    csv_input['R_RG_Ext'] = R_sns_data[:][0]
-    csv_input['R_RG_Flx'] = R_sns_data[:][1]
-    csv_input['R_PF_Hip_Ext'] = R_sns_data[:][2]
-    csv_input['R_PF_Hip_Flx'] = R_sns_data[:][3]
-    csv_input['R_PF_KA_Ext'] = R_sns_data[:][4]
-    csv_input['R_PF_KA_Flx'] = R_sns_data[:][5]
-    csv_input['R_MN_Hip_Ext'] = R_sns_data[:][6]
-    csv_input['R_MN_Hip_Flx'] = R_sns_data[:][7]
-    csv_input['R_MN_Knee_Ext'] = R_sns_data[:][8]
-    csv_input['R_MN_Knee_Flx'] = R_sns_data[:][9]
-    csv_input['R_MN_Ankle_Ext'] = R_sns_data[:][10]
-    csv_input['R_MN_Ankle_Flx'] = R_sns_data[:][11]
-    csv_input['R_Hip_Joint_pos'] =  R_hip_joint_pos
-    csv_input['R_Knee_Joint_pos'] =  R_knee_joint_pos
-    csv_input['R_Ankle_Joint_pos'] =  R_ankle_joint_pos
+        csv_input = pd.read_csv('sim_outputs.csv')
+        csv_input['L_RG_Ext'] = R_sns_data[:][0]
+        csv_input['L_RG_Flx'] = L_sns_data[:][1]
+        csv_input['L_PF_Hip_Ext'] = L_sns_data[:][2]
+        csv_input['L_PF_Hip_Flx'] = L_sns_data[:][3]
+        csv_input['L_PF_KA_Ext'] = L_sns_data[:][4]
+        csv_input['L_PF_KA_Flx'] = L_sns_data[:][5]
+        csv_input['L_MN_Hip_Ext'] = L_sns_data[:][6]
+        csv_input['L_MN_Hip_Flx'] = L_sns_data[:][7]
+        csv_input['L_MN_Knee_Ext'] = L_sns_data[:][8]
+        csv_input['L_MN_Knee_Flx'] = L_sns_data[:][9]
+        csv_input['L_MN_Ankle_Ext'] = L_sns_data[:][10]
+        csv_input['L_MN_Ankle_Flx'] = L_sns_data[:][11]
+        csv_input['L_Hip_Joint_pos'] =  L_hip_joint_pos
+        csv_input['L_Knee_Joint_pos'] =  L_knee_joint_pos
+        csv_input['L_Ankle_Joint_pos'] =  L_ankle_joint_pos
 
-    csv_input.to_csv('sim_outputs.csv', sep=',', index=False, header=True)
+        csv_input['R_RG_Ext'] = R_sns_data[:][0]
+        csv_input['R_RG_Flx'] = R_sns_data[:][1]
+        csv_input['R_PF_Hip_Ext'] = R_sns_data[:][2]
+        csv_input['R_PF_Hip_Flx'] = R_sns_data[:][3]
+        csv_input['R_PF_KA_Ext'] = R_sns_data[:][4]
+        csv_input['R_PF_KA_Flx'] = R_sns_data[:][5]
+        csv_input['R_MN_Hip_Ext'] = R_sns_data[:][6]
+        csv_input['R_MN_Hip_Flx'] = R_sns_data[:][7]
+        csv_input['R_MN_Knee_Ext'] = R_sns_data[:][8]
+        csv_input['R_MN_Knee_Flx'] = R_sns_data[:][9]
+        csv_input['R_MN_Ankle_Ext'] = R_sns_data[:][10]
+        csv_input['R_MN_Ankle_Flx'] = R_sns_data[:][11]
+        csv_input['R_Hip_Joint_pos'] =  R_hip_joint_pos
+        csv_input['R_Knee_Joint_pos'] =  R_knee_joint_pos
+        csv_input['R_Ankle_Joint_pos'] =  R_ankle_joint_pos
+
+        csv_input.to_csv('sim_outputs.csv', sep=',', index=False, header=True)
 
 
 def main():
@@ -491,7 +488,19 @@ def main():
     Ipert[1] = 1
     inputs = Iapp + Ipert
 
-    run_sims(sns_dt = dt, cpg_inputs = inputs, xml_path = xml_path, time_vec = t, num_steps = numSteps)
+    R_sns_model = build_net(dt = dt)
+    L_sns_model = build_net(dt = dt)
+    mj_model, mj_data = build_mujoco_model(xml_path=xml_path, mujoco_dt = dt/1000)
+
+    save_times = np.zeros(100)
+    for i in range(100):
+        t_start = time.time()
+        run_sims(R_sns_model, L_sns_model, mj_model, mj_data, cpg_inputs = inputs, time_vec = t, num_steps = numSteps, save_data=0)
+        save_times[i] = time.time() - t_start
+
+    time_comp = pd.read_csv('sim_time_comp.csv', delimiter=',')
+    time_comp['SNS_Mujoco Sim Times'] = save_times
+    time_comp.to_csv('sim_time_comp.csv', sep=',', index=False, header=True)
 
     
     

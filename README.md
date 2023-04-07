@@ -48,11 +48,12 @@ The files in this repository contain simulations for biomechanical models of a r
             
             - Solving for the steepness, s, we find $s = 0.1532$
         - run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec)
-    - run_sims(sns_dt, cpg_inputs, xml_path, num_steps, time_vec): runs the sns and mujoco simulations together and outputs to a csv file
-        - sns_dt is used to build the sns model, then converted to seconds and used with xml path to build the mujoco model
+    - run_sims(R_sns_model, L_sns_model, mj_model, mj_data, cpg_inputs, num_steps, time_vec, save_data=1): runs the sns and mujoco simulations together and outputs to a csv file
+        - pass in the sns and mujoco models
         - cpg_inputs is used to initially excite the cpg's in the neural models to begin oscillations
         - num_steps specifies the number of steps in the simulations
         - time_vec passes an array of time and is only used to write to a csv file
+        - save_data is a boolean variable which tells whether or not to save the sim data to a csv 
         - we first initialize variables and set other variables which reference the indices used in the sns and mujoco models. 
         - then we initialize the sns_inputs variable with the cpg_inputs and the muscle tensions from the mujoco model (zero for the first time step) 
         - We then repeat the following for num_steps:
